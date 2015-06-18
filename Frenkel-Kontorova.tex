@@ -1,0 +1,397 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc, lucidbry}
+\usepackage{mynotes,cite}
+
+\pagestyle{notes}
+\renewcommand{\NotesTitle}{Notes on Frenkel-Kontorova Model, }
+
+\begin{document}
+
+\section{The Frenkel-Kontorova Model}
+
+\subsection{Basic Equation (Ring Geometry)}
+
+The Hamiltonian for the basic Frenkel-Kontorova model is
+\[
+H=\sum_{i=1}^N\left[\frac{{p_i}^2}{2m_i}
+	+\frac{g_i}{2}\left(z_i-z_{i-1}-a_i\right)^2
+	+\frac{V_0}{2}\left(1-\cos\frac{2\pi z_i}{\lambda}\right)\right].
+\]
+Some of the notation here and in the following is taken from the review paper by Braun and Kivshar on the FK equation, \textit{Physics Reports} \textbf{306}, pp. 1--108 (1998). We are allowing here for the possibility that every mass and spring is different, but keeping the assumption that the substrate potential is uniform. The parameters that appear are $m_i$, the mass of particle $i$, $g_i$ and $a_i$, the strength and equilibrium length of the spring that connects particle $i$ to particle $i-1$, $V_0$, the peak-to-peak amplitude of the substrate potential, and $\lambda$, the wavelength of the substrate potential.
+
+We are assuming a ring geometry here, with total length $L$. Let the length of each carbon ring be $l$ and the total number of carbon rings be $N_0$, so that the total length of the carbon nanotube is $L=N_0l$. Each carbon ring contains two wavelengths of the substrate potential, so that $l=2\lambda$ and $L=2N_0\lambda$. We are also assuming that there are $N$ masses, and that mass $N$ is connected to mass $1$, so that the spring described by constants $k_1$ and $a_1$ connects these two masses. As a result, in the numerical code we will increase the value of $a_1$ by $L$ to account for the length of the entire CNT. We will use the parameter $S$ to denote the deviation between the number of carbon rings and the number of water molecules, using $N=N_0+S$.
+
+The equations of motion are
+\begin{align*}
+\dot{z}_i&=\frac{\d H}{\d p_i}=\frac{p_i}{m_i},\\
+\dot{p}_i&=-\frac{\d H}{\d z_i}=-g_i(z_i-z_{i-1}-a_i)
+	+g_{i+1}(z_{i+1}-z_i-a_{i+1})
+	-\frac{\pi V_0}{\lambda}\sin\frac{2\pi z_i}{\lambda}.
+\end{align*}
+We'll work with dimensionless variables. To start, we'll define the average mass through
+\[
+m=\frac{1}{N}\sum_{i=1}^N m_i.
+\]
+To nondimensionalize, define the following constants:
+\[
+t_0 = \frac{\lambda}{2\pi}\sqrt{\frac{2m}{V_0}},\quad
+p_0 = \sqrt{\frac{mV_0}{2}},\quad
+g_0 = \frac{2\pi^2V_0}{\lambda^2}.
+\]
+Then define the following dimensionless variables
+\[
+\tau=\frac{t}{t_0},\quad
+\phi_i=\frac{2\pi}{\lambda} z_i,\quad
+\rho_i=\frac{p_i}{p_0},\quad
+\alpha_i=\frac{2\pi}{\lambda} a_i,\quad
+\mu_i=\frac{m_i}{m},\quad
+\gamma_i=\frac{g_i}{g_0}.
+\]
+In terms of these variables, the equations of motion become
+\begin{align*}
+\phi_i'&=\frac{\rho_i}{\mu_i},\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\sin\phi_i.
+\end{align*}
+Note that if all the masses and springs are identical, then $\mu_i=1$ and all the $\alpha_i$ are equal so that they cancel, and this reduces to a one-parameter set of equations.
+
+The initial location of water molecule $i$ is taken to be $z_i=(i-1)L/N$, so that $z_i$ falls in the range $[0,(N-1)L/N]$. This means that the dimensionless position $\phi_i$ falls in the range $[0,2\pi(N-1)L/(N\lambda)]$. Using $L=2N_0\lambda$ and $N=N_0+S$, this range becomes $[0,4\pi(N-1)N_0/N]$. If $S=0$, then $N=N_0$, and this becomes $[0,4\pi(N_0-1)]$. The ring geometry means that $\phi=4\pi$ is the same location as $\phi=0$, so the dimensionless length of the last spring should be increased by $4\pi$.
+
+In the code, we'll take the above initial condition, then let the chain relax to a minimum-energy soliton, before we apply any external driving force.
+
+We can add a damping force $-\eta p_i$ and a constant external driving force, $f_i$, to the original equations, to obtain
+\begin{align*}
+\dot{z}_i&=\frac{p_i}{m_i},\\
+\dot{p}_i&=-g_i(z_i-z_{i-1}-a_i)
+	+g_{i+1}(z_{i+1}-z_i-a_{i+1})
+	-\eta p_i+f_i
+	-\frac{\pi V_0}{\lambda}\sin\frac{2\pi z_i}{\lambda}.
+\end{align*}
+Following Braun and Kivshar, I've included the mass of each molecule in the dissipation force, so $\eta$ has units of $\text{s}^{-1}$. Defining the variables
+\[
+\beta=t_0\eta,\quad
+\epsilon_i = \frac{t_0}{p_0}f_i,
+\]
+the dimensionless version of the equations of motion become
+\begin{align*}
+\phi_i'&=\frac{\rho_i}{\mu_i},\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\beta\rho_i+\epsilon_i
+	-\sin\phi_i.
+\end{align*}
+For convenience, let $\delta_i=1/\mu_i$, so that the equations of motion read
+\begin{align*}
+\phi_i'&=\delta_i\rho_i,\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\beta\rho_i+\epsilon_i
+	-\sin\phi_i.
+\end{align*}
+If we now go back and express the original Hamiltonian in terms of the dimensionless variables, we have
+\[
+H=\frac{V_0}{2}\sum_{i=1}^N
+	\left[\frac{{\rho_i}^2}{2\mu_i}
+	+\frac{\gamma_i}{2}\left(\phi_i-\phi_{i-1}-\alpha_i\right)^2
+	+\left(1-\cos\phi_i\right)\right].
+\]
+We can calculate the power being added to the chain from the equation of motion. If $K$ is the (dimensionless) kinetic energy of the chain, then, working in the dimensionless variables, we have
+\begin{align*}
+P&=\frac{\td K}{\td\tau}
+	=\frac{\td}{\td\tau}\sum_{i=1}^N\frac{{\rho_i}^2}{2\mu_i}
+	=\sum_{i=1}^N \frac{\rho_i}{\mu_i}\rho'_i\\
+	&=\sum_{i=1}^N \delta_i\rho_i\Big[
+		-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+		+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+		-\beta \rho_i+\epsilon_i
+		-\sin\phi_i\Big].
+\end{align*}
+To add back the units, we multiply this by $V_0/2t_0$.
+
+Lastly, we want to add thermal noise to the equations. Following Braun and Kivshar, we want to add the term $\delta F_i(t)$ to the right-hand side of the equation for $\dot{p}_i$, where
+\[
+\langle\delta F_i(t)\delta F_j(t')\rangle=2\eta m_ik_\text{B}T\delta(t-t')\delta_{ij}.
+\]
+Here $k_\text{B}$ is the Boltzmann constant and $T$ is the temperature.
+
+Braun and Kivshar pick a different spatial correlation, though they also say that the spatial correlation ``may be defined in an arbitrary manner.'' I don't quite understand this, but no spatial correlation seems reasonable to me.
+
+This correlation implies that
+\[
+\sum_{j=1}^N\int \td t' \langle\delta F_i(t)\delta F_j(t')\rangle
+	= 2\eta m_ik_\text{B}T.
+\]
+In the code, of course, time is discrete. Let $t_n=n\Delta t$, where $\Delta t$ is the interval at which we will add the thermal noise. Also define $\Fs_i^n=\delta F_i(t_n)$. Then the normalization condition becomes
+\[
+\sum_{j=1}^N\sum_m \Delta t\langle \Fs_i^n\Fs_j^{m}\rangle = 2\eta m_ik_\text{B}T.
+\]
+Now let $\Fs_i^n=A_iR_i^n$, where $R_i^n$ is a Gaussian random variable with zero mean and unit standard deviation such that $\langle R_i^nR_j^m\rangle=\delta_{ij}\delta_{nm}$. Then the normalization condition becomes
+\[
+\sum_{j=1}^N\sum_m \Delta t A_i A_j\langle R_i^nR_j^m\rangle
+	=\sum_{j=1}^N\sum_m \Delta t A_i A_j\delta_{ij}\delta_{nm}
+	=\Delta t{A_i}^2
+	=2\eta m_ik_\text{B}T,
+\]
+and the normalization factor $A_i$ is simply
+\[
+A_i=\sqrt{\frac{2\eta m_ik_\text{B}T}{\Delta t}}.
+\]
+This has units of force, of course, or momentum per unit time. In the code, a random variable with magnitude $A_i\Delta t$ will be added to the momentum at intervals of $\Delta t$. In terms of the non-dimensional variables $\rho_i$ and $\tau$, this magnitude becomes
+\[
+\Omega_i=\frac{t_0}{p_0}A_i,
+\]
+so that
+\[
+\Omega_i=\frac{t_0}{p_0}A_i
+	=\frac{t_0}{p_0}\sqrt{\frac{2\eta m_ik_\text{B}T}{\Delta t}}.
+\]
+In the code we'll multiply $\Omega_i$ by $\Delta\tau$ and add it into the momentum every $\Delta\tau$.
+
+Some authors use a different convention and put the discreteness parameter in the sine term, making the spring constants equal to unity. To relate this to our parameters above, define the average spring constant as
+\[
+\gamma=\frac{1}{N}\sum_{i=1}^N \gamma_i.
+\]
+Then define $T=\sqrt{\gamma}\tau$ and $P_i=\rho_i/\sqrt{\gamma}$. Then
+\begin{align*}
+\phi_i'&=\delta_i P_i,\\
+P_i'&=-\frac{\gamma_i}{\gamma}(\phi_i-\phi_{i-1}-\alpha_i)
+	+\frac{\gamma_{i+1}}{\gamma}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\frac{\beta}{\sqrt{\gamma}}P_i+\frac{\epsilon_i}{\gamma}
+	-\frac{1}{\gamma}\sin\phi_i.
+\end{align*}
+Note that if all the masses and springs are identical then $\delta_i=1$ and $\gamma_i/\gamma=1$. The constant $\gamma$ is the square of the discreteness parameter of Peyrard and Kruskal, $\gamma=d^2$.
+
+\subsection{Parameter Values}
+
+The length of each carbon ring is $l=0.2456\,\text{nm}$, so the wavelength of the substrate potential is $\lambda=0.1228\,\text{nm}$. The molar mass of water is $18.015\,\text{g/mol}$, so the mass of a single water molecule is $2.992\times10^{-26}\,\text{kg}$. According to Tom Sisan, the equilibrium spacing between water molecules in a smooth tube is approximately $a=0.28\,\text{nm}$, about the same as the length of a carbon ring.
+
+The supplemental information from the Sisan/Lichter PRL provides the following data, taken from molecular dynamics simulations:
+\begin{center}
+\begin{tabular}{ccc}
+CNT type & $h$ (kcal/mol) & $c$ (nm/ps) \\\hline
+(4, 4) & $3.5\times10^{-1}$ & $11.1$ \\
+(5, 5) & $1.6\times10^{-2}$ & $7.4$ \\
+(6, 6) & $2.1\times10^{-3}$ & $4.4$
+\end{tabular}
+\end{center}
+
+Here $h$ is the peak-to-peak amplitude of the substrate potential and $c$ is the speed of sound in water inside the nanotube. I think the conversion factor from $\text{kcal}/\text{mol}$ to J is $6.948\times10^{-21}$. We therefore have, for the (4, 4) nanotube, $V_0=2.432\times10^{-21}\,\text{J}$. For the (5, 5) nanotube this is $V_0=1.112\times10^{-22}\,\text{J}$, and for the (6, 6) nanotube it is $V_0=1.459\times10^{-23}\,\text{J}$.
+
+To find the spring constant, we'll use the wave speed given above, which can be written as
+\[
+c = \sqrt{\frac{\tau}{\rho}}=\sqrt{\frac{ga}{m/a}}=a\sqrt{\frac{g}{m}}.
+\]
+This is based on the wave speed in a one dimensional string with tension $\tau$ and mass density $\rho$. In terms of the values above for $a$ and $m$, this gives a spring constant of $g=47.0\,\text{N}/\text{m}$ for the (4, 4) nanotube, a spring constant of $g=20.9\,\text{N}/\text{m}$ for the (5, 5) nanotube, and a spring constant of $g=7.39\,\text{N}/\text{m}$ for the (6, 6) nanotube. It's not clear to me why the spring constant should vary depending on the nanotube.
+
+Using these values leads to the following parameter values:
+\begin{center}
+\begin{tabular}{cccccc}
+CNT type & $t_0$ (ps) & $p_0/m$ ($\text{m}/\text{s}$) & $g_0$ ($\text{N}/\text{m}$) & $\gamma$ & $d$ \\\hline
+(4, 4) & $0.0970$ & $202$ & $3.18$ & $14.8$ & $3.84$ \\
+(5, 5) & $0.453$ & $43.1$ & $0.146$ & $144$ & $12.0$ \\
+(6, 6) & $1.25$ & $15.6$ & $0.0191$ & $387$ & $19.7$
+\end{tabular}
+\end{center}
+
+From Figure S.6 of the supplement to the Sisan/Lichter PRL, typical external forces run from $10^{-2}\,\text{pN}$ to $10\,\text{pN}$ for the (4, 4) nanotube, from $10^{-3}\,\text{pN}$ to $10^{-1}\,\text{pN}$ for the (5, 5) nanotube, and from $10^{-4}\,\text{pN}$ to $10^{-3}\,\text{pN}$ for the (6, 6) nanotube.
+
+I don't see any information about the damping coefficient, but for the sake of making an estimate I'll start with a flow rate of $\dot{x}=10\,\text{m}/\text{s}$. This comes from Figure S.7 of the supplement, which shows flow rates in the range $[0, 50]$ in $\text{nm}/\text{ns}$. Using the mass of the water molecule, this corresponds to a momentum of $29.92\times10^{-26}\,\text{kg}\udot\text{m}/\text{s}$. If we then pick $\eta=3\times10^{12}\,\text{s}^{-1}$, that would give us a dissipative force of $8.976\times10^{-1}\,\text{pN}$, which is perhaps a reasonable amount of damping for the (4, 4) nanotube.
+
+Here's a different way to pick the damping coefficient. We will try to pick $\eta$ to produce the correct soliton velocity as measured by the MD simulations. According to McLaughlin and Scott (\textit{Physics Review A} \textbf{18}, p. 1652), given the damped driven sine-Gordon equation,
+\[
+\phi_{tt}-\phi_{zz}+\sin\phi=-\beta\phi_t-\epsilon,
+\]
+the soliton velocity is
+\[
+u=\pm\left[1+\left(\frac{4\beta}{\pi\epsilon}\right)^2\right]^{-1/2}.
+\]
+The sine-Gordon is normalized so that the linear wave speed is unity, so the soliton speed here is measured in units of $c=a\sqrt{g/m}$, the wave speed. Putting in the dimensions, the soliton speed becomes
+\[
+v=\pm a\sqrt{\frac{g}{m}}
+	\left[1+\left(\frac{4t_0\eta}{\pi t_0 f/p_0}\right)^2\right]^{-1/2}
+	=\pm a\sqrt{\frac{g}{m}}
+	\left[1+\left(\frac{4p_0\eta}{\pi f}\right)^2\right]^{-1/2}.
+\]
+From Figure 4 of the Sisan/Lichter PRL, we see that at low temperatures ($T=5\,\text{K}$), the flow rate for the (4, 4) nanotube has an elbow (that is, saturates) at an external force of about $10^{-2}\,\text{pN}$. Using the parameters above to calculate $p_0=6.032\times10^{-12}\,\text{pN}\udot\text{s}$,  the above formula reproduces the location of the elbow with a damping of about $3\times10^{9}\,\text{Hz}$. Since we picked $g$ to match the wave speed as given in the above table, this also gives a maximum soliton speed of $11.1\,\text{nm}/\text{ps}$.
+
+For the (5, 5) nanotube, the flow rate saturates around $4\times10^{-3}\,\text{pN}$. Using the value for $p_0$ for this nanotube leads to a damping of about $3\times10^9\,\text{Hz}$, same as for the (4, 4) nanotube.
+
+To translate this into a flow rate, note that a single kink moves each molecule by one wavelength of the substrate potential. So each pass of the kink through the entire nanotube moves the entire chain by one wavelength. The length of the tube is $L=2N_0\lambda$, so the maximum flow rate in the tube is
+\[
+V = \frac{v\lambda}{L}(\text{\# of kinks})
+	= \frac{v(\text{\# of kinks})}{2N_0}.
+\]
+For a (4, 4) nanotube with $N_0=200$ and $S=-1$ there are two kinks in the nanotube, so the maximum flow rate should be (with the above parameters) $55.5\,\text{m}/\text{s}$.
+
+To get an estimate of the range of external forcing that might be realistic, we'll calculate the force per particle from the pressure drop across the nanotube, which we'll call $\Delta P$. Let the molecules in the tube have mass $M$, and let the total force on the molecules be $F$. Then
+\[
+M=\sum_{i=1}^N m_i\quad\text{and}\quad F=\sum_{i=1}^N f_i.
+\]
+The total force on the molecules in the tube due to the pressure gradient is $F=A\Delta P$, where $A$ is the cross-sectional area of the molecules. To estimate $A$, we'll use a diameter of $D=0.29\,\text{nm}$ for the diameter of a water molecule. The cross-sectional area is then
+\[
+A=\frac{\pi D^2}{4}=6.6\times10^{-20}\,\text{m}^2.
+\]
+If we take the pressure drop to be $\Delta P=10\,\text{bar}=10^6\,\text{Pa}$, then we have
+\[
+F=6.6\times10^{-14}\,\text{N}=0.066\,\text{pN}.
+\]
+Assuming that all the molecules in the tube are identical, we then have
+\[
+f_i=\frac{F}{N}=\frac{6.6\times10^{-20}\,\text{m}^2}{N}\Delta P,
+\]
+where $\Delta P$ is measured in Pascals.
+
+\subsection{Parameter Comparison}
+
+We'll start by thinking about the forces acting on the chain. Looking at the dimensionless equations of motion, the maximum force due to the carbon nanotube has magnitude 1, while the force on the $i^\text{th}$ mass due to one of the connecting springs is $\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1}$). These will be equal when
+\[
+\Delta\phi_i=\alpha_{i+1}+\frac{1}{\gamma_{i+1}},
+\]
+where $\Delta\phi_i=\phi_{i+1}-\phi_i$. Assuming a chain of identical springs, $\alpha=2\pi a/\lambda=14.3$. From the table above, $\gamma=14.8$ for the (4, 4) nanotube, yielding a change to $\Delta\phi$ from equilibrium of 0.0676. For the (5, 5) nanotube, $\gamma=144$, so the possible change to $\Delta\phi$ is much smaller, $6.94\times10^{-3}$. This says to me that the springs are very strong compared to the nonlinearity.
+
+The external force is normalized according to $\epsilon=t_0 f/p_0$. For the (4, 4) nanotube, $p_0/t_0=62.3\,\text{pN}$, so a force of $0.01\,\text{pN}$ corresponds to $\epsilon=1.60\times10^{-4}$. For the (5, 5) nanotube, $p_0/t_0=2.85\,\text{pN}$, so a force of $0.001\,\text{pN}$ corresponds to $\epsilon=3.51\times10^{-4}$. Obviously, these external forces are very small to both the nonlinearity and the spring forces.
+
+Now let's move on to the frequencies and the damping. Taking $\mu_i=1$ (identical particles), the linearized frequency of the substrate potential is $\omega_\text{sub}=1$. The frequencies of the modes of vibration of the water chain are given by (taking uniform springs, so that $\gamma_i=\gamma$)
+\[
+\omega_n=2\sqrt{\gamma}\sin\frac{n\pi}{N},
+\]
+where $n=[1,N/2]$ for periodic boundary conditions. For $N\gg1$, the lowest frequency is $\omega_1\simeq2\pi\sqrt{\gamma}/N$, while the highest frequency is $\omega_{N/2}=2\sqrt{\gamma}$. For the (4, 4) nanotube, this gives $\omega_1\simeq 24.2/N$ and $\omega_{N/2}=7.69$. For the (5, 5) nanotube, these values are $\omega_1\simeq 74.4/N$ and $\omega_{N/2}=24$.
+
+The damping parameter is $\beta=t_0\eta$, so a damping of $\eta=3\times10^9\,\text{s}^{-1}$ yields a damping parameter of $\beta=2.91\times10^{-4}$ for the (4, 4) nanotube and $\beta=1.36\times10^{-3}$ for the (5, 5) nanotube. These seem tiny to me. Of course judging this depends on the duration of the simulation. A $1\,\text{ns}$ run converts to $\tau=1.03\times10^4$ for the (4, 4) nanotube and $\tau=2.21\times10^3$ for the (5, 5) nanotube.
+
+\subsection{Nonlinear Damping}
+
+To eliminate the coupling to the high-frequency linear modes, we'll try modifying the damping term to read
+\[
+-\eta \left(p_i+\sgn(p_i)\frac{|p_{i+1}-p_i|+|p_{i}-p_{i-1}|}{2}\right).
+\]
+This damping tends to kill off the soliton as well, because it removes any ``sharp'' features in the chain. To try to kill off just the high-frequency modes, we can modify this as follows:
+\[
+-\eta \left(p_i+\sgn(p_i)\frac{(1-\sgn(p_{i+1}-p_i))|p_{i+1}-p_i|+(1-\sgn(p_{i}-p_{i-1}))|p_{i}-p_{i-1}|}{4}\right).
+\]
+This only creates damping when the momenta of the neighboring molecules have the opposite sign.
+
+\subsection{Rolling Mode}
+
+Suppose that rather than starting with a kink, we start with a high-velocity rolling mode. We'll pick the velocity so that the damping equals the applied force, \textit{i.e.} so that
+\[
+\eta p_i=f_i\quad\Rightarrow\quad
+p_i=\frac{f_i}{\eta}.
+\]
+With a force of $1\,\text{pN}$ and a damping coefficient of $3\times10^9\,\text{Hz}$, this leads to an initial momentum of $p=3.33\times10^{-22}\,\text{kg}\udot\text{m}/\text{s}$. Of course we'll start with equal spacing of the molecules.
+
+\subsection{Moving Kink Initial Conditions}
+
+We can try to use the moving kink solution to the sine-Gordon equation as our initial condition for the water molecules in the nanotube. This should be closer to the actual steady-state solution (assuming such a thing exists) than starting with a stationary kink or some other initial condition. Following Braun and Kivshar (but with slightly different notation), the sine-Gordon equation and its kink solution are
+\[
+\phi_{tt}-\phi_{zz}+\sin\phi=0,\quad
+\phi^{(\text{kink})}(z,t)=4\tan^{-1}\left[\e^{-\sigma w(v)(z-vt)}\right].
+\]
+Here $\sigma=+1$ for a kink and $-1$ for an antikink. For the carbon nanotube, we have $\sigma=\sgn S$. The kink width $w(v)$ is given by $w(v)=1/\sqrt{1-v^2}$, assuming we are measuring $v$ in units of the speed of sound, as discussed above. Note that all the variables here are dimensionless, of course.
+
+To implement this for the water chain, we need to evaluate this at the discrete locations of the water molecules, which we'll call $z_i$. If we spatially discretize the sine-Gordon equation with a spacing $\Delta z$, we obtain
+\[
+\ddot{\phi}_i-\frac{2\phi_i-\phi_{i+1}-\phi_{i-1}}{\Delta z^2}+\sin\phi_i=0.
+\]
+Comparing this to our previous equations, we see that we should use $\Delta z=1/\sqrt{\langle\gamma\rangle}$, where $\langle\gamma\rangle$ is the average of the dimensionless spring constants. The location of each molecule, $z_i$, is a dimensionless location. We will take the first molecule to correspond to $z_1=0$, so we will write 
+\[
+z_i=(i-1)\Delta z=\frac{i-1}{\sqrt{\langle\gamma\rangle}}.
+\]
+The formula above locates the center of the kink at $z=0$. We of course want to allow for the possibility of multiple kinks, so we will consider a kink at location $Z=\xi/\sqrt{\langle\gamma\rangle}$. The formula for the location of each molecule for a single kink at time $t=0$ then becomes
+\[
+\phi_i^{(\text{kink})}=4\tan^{-1}\left[\e^{-\sigma w(v)(z_i-Z)}\right].
+\]
+In practice, we will have multiple kinks (or antikinks); there are $2|S|$ kinks or antikinks in the nanotube, spaced equally for the initial condition; in the dimensionless units, the kink spacing is simply $N/(2|S|)$. If there are two kinks ($S=\pm1$), for example, they are initially located at $\xi=N/4$ and $\xi=3N/4$.
+
+The initial velocity of each kink is given by
+\begin{align*}
+u_i^{(\text{kink})}
+	&=\frac{\td}{\td t}\left\{4\tan^{-1}\left[
+		\e^{-\sigma w(v)(z_i-Z-vt)}\right]\right\}
+	=\frac{4\sigma w(v) v\e^{-\sigma w(v)(z_i-Z-vt)}}
+		{1+\e^{-2\sigma w(v)(z_i-Z-vt)}}.
+\end{align*}
+Evaluating this at $t=0$, we have
+\[
+u_i^{(\text{kink})}
+	=\frac{4\sigma w(v) v\e^{-\sigma w(v)(z_i-Z)}}
+		{1+\e^{-2\sigma w(v)(z_i-Z)}}
+	=2\sigma w(v) v\sech[-\sigma w(v)(z_i-Z)].
+\]
+Note that when $S<0$, then this predicts that $v<0$. But of course the external force is acting to increase $\phi_i$, so we always have $v>0$. I don't quite understand this.
+
+We don't want to let our kinks get too steep, so we'll limit the value that $w(v)$ can take on. Let's say we want the kink to span approximately 8 molecules. The slope at the center of the kink is $s=2w(v)$. We therefore want (at least approximately)
+\[
+8s=\frac{2\pi}{\Delta z}=2\pi\sqrt{\langle\gamma\rangle}.
+\]
+Solving for $w(v)$, we have
+\[
+w(v)=\frac{\pi\sqrt{\langle\gamma\rangle}}{8}
+\quad\Rightarrow\quad
+v=\sqrt{1-\frac{64}{\pi^2\langle\gamma\rangle}}.
+\]
+Using the formula for the soliton velocity, the forcing that corresponds to this velocity is (assuming I did my algebra right)
+\[
+\epsilon=\frac{\beta}{4}\sqrt{\langle\gamma\rangle-\frac{64}{\pi^2}}
+\quad\Rightarrow\quad
+f=\frac{p_0\epsilon}{t_0}.
+\]
+This should be the maximum driving we use when setting up our initial condition. In practice, the above estimate is too low, and I used a maximum force of three times this for setting the width of the soliton.
+
+\subsection{Two Dimensional Model}
+
+To try to get a sense of what's going on in the molecular dynamics simulations, let's make up a two dimensional model. This may give us some insight into the energy transfer between the directions and the effect of the damping in the axial and transverse directions. For our two dimensional model, we'll take the Hamiltonian to be
+\[
+H=\sum_{i=1}^N\left[\frac{{p_i}^2}{2m_i}+\frac{{P_i}^2}{2m_i}
+	+\frac{g_i}{2}\left(z_i-z_{i-1}-a_i\right)^2
+	+\frac{G}{2}{X_i}^2
+	+\frac{V_0}{4}\left(1-\cos\frac{2\pi z_i}{\lambda}\right)
+		\left(1+\cos\frac{2\pi X_i}{\lambda}\right)\right].
+\]
+The equations of motion are then
+\begin{align*}
+\dot{z}_i&=\frac{p_i}{m_i},\\
+\dot{p}_i&=-g_i(z_i-z_{i-1}-a_i)
+	+g_{i+1}(z_{i+1}-z_i-a_{i+1})
+	-\frac{\pi V_0}{2\lambda}\sin\frac{2\pi z_i}{\lambda}
+		\left(1+\cos\frac{2\pi X_i}{\lambda}\right),\\
+\dot{X}_i&=\frac{P_i}{m_i},\\
+\dot{P}_i&=-GX_i+\frac{\pi V_0}{2\lambda}\sin\frac{2\pi X_i}{\lambda}
+		\left(1-\cos\frac{2\pi z_i}{\lambda}\right).
+\end{align*}
+We'll use the same constants and dimensionless variables as before, repeated here for clarity:
+\[
+m=\frac{1}{N}\sum_{i=1}^N m_i,\quad
+t_0 = \frac{\lambda}{2\pi}\sqrt{\frac{2m}{V_0}},\quad
+p_0 = \sqrt{\frac{mV_0}{2}},\quad
+g_0 = \frac{2\pi^2V_0}{\lambda^2},
+\]
+and
+\[
+\tau=\frac{t}{t_0},\quad
+\phi_i=\frac{2\pi}{\lambda} z_i,\quad
+\rho_i=\frac{p_i}{p_0},\quad
+\alpha_i=\frac{2\pi}{\lambda} a_i,\quad
+\mu_i=\frac{m_i}{m},\quad
+\gamma_i=\frac{g_i}{g_0},
+\]
+and with
+\[
+\Gamma=\frac{G}{g_0},\quad
+\Phi_i=\frac{2\pi}{\lambda}X_i,\quad
+\Upsilon_i=\frac{P_i}{p_0}.
+\]
+In terms of these variables, the equations of motion become
+\begin{align*}
+\phi_i'&=\frac{\rho_i}{\mu_i},\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\frac{1}{2}\sin\phi_i\left(1+\cos\Phi_i\right),\\
+\Phi_i'&=\frac{\Upsilon_i}{\mu_i},\\
+\Upsilon_i'&=-\Gamma\Phi_i
+	+\frac{1}{2}\sin\Phi_i\left(1-\cos\phi_i\right).
+\end{align*}
+
+\end{document}
