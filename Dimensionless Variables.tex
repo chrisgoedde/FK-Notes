@@ -1,0 +1,97 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc, lucidbry}
+\usepackage{mynotes,cite}
+
+\pagestyle{notes}
+\renewcommand{\NotesTitle}{FK Dimensionless Variables, }
+
+\begin{document}
+
+\section{Dimensionless FK Model}
+
+The Hamiltonian for the basic Frenkel-Kontorova model is
+\begin{equation}
+H=\sum_{i=1}^N\left[\frac{{p_i}^2}{2m_i}
+	+\frac{g_i}{2}\left(z_i-z_{i-1}-a_i\right)^2
+	+\frac{V_0}{2}\left(1-\cos\frac{2\pi z_i}{\lambda}\right)\right].
+\end{equation}
+Some of the notation here and in the following is taken from the review paper by Braun and Kivshar on the FK equation, \textit{Physics Reports} \textbf{306}, pp. 1--108 (1998). The parameters that appear are $m_i$, the mass of particle $i$, $g_i$ and $a_i$, the strength and equilibrium length of the spring that connects particle $i$ to particle $i-1$, $V_0$, the peak-to-peak amplitude of the substrate potential, and $\lambda$, the wavelength of the substrate potential.
+
+The equations of motion are
+\begin{align}
+\dot{z}_i&=\frac{\d H}{\d p_i}=\frac{p_i}{m_i},\\
+\dot{p}_i&=-\frac{\d H}{\d z_i}=-g_i(z_i-z_{i-1}-a_i)
+	+g_{i+1}(z_{i+1}-z_i-a_{i+1})
+	-\frac{\pi V_0}{\lambda}\sin\frac{2\pi z_i}{\lambda}.
+\end{align}
+We'll work with dimensionless variables. To start, we'll define the average mass through
+\begin{equation}
+m=\frac{1}{N}\sum_{i=1}^N m_i.
+\end{equation}
+To nondimensionalize, define the following constants:
+\begin{equation}
+t_0 = \frac{\lambda}{2\pi}\sqrt{\frac{2m}{V_0}},\quad
+p_0 = \sqrt{\frac{mV_0}{2}},\quad
+g_0 = \frac{2\pi^2V_0}{\lambda^2}.
+\end{equation}
+Then define the following dimensionless variables
+\begin{equation}
+\tau=\frac{t}{t_0},\quad
+\phi_i=\frac{2\pi}{\lambda} z_i,\quad
+\rho_i=\frac{p_i}{p_0},\quad
+\alpha_i=\frac{2\pi}{\lambda} a_i,\quad
+\mu_i=\frac{m_i}{m},\quad
+\gamma_i=\frac{g_i}{g_0}.
+\end{equation}
+In terms of these variables, the equations of motion become
+\begin{align}
+\phi_i'&=\frac{\rho_i}{\mu_i},\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\sin\phi_i.
+\end{align}
+Note that if all the masses and springs are identical, then $\mu_i=1$ and all the $\alpha_i$ are equal so that they cancel, and this reduces to a one-parameter set of equations.
+
+We can add a damping force $-\eta p_i$ and a constant external driving force, $f_i$, to the original equations, to obtain
+\begin{align}
+\dot{z}_i&=\frac{p_i}{m_i},\\
+\dot{p}_i&=-g_i(z_i-z_{i-1}-a_i)
+	+g_{i+1}(z_{i+1}-z_i-a_{i+1})
+	-\eta p_i+f_i
+	-\frac{\pi V_0}{\lambda}\sin\frac{2\pi z_i}{\lambda}.
+\end{align}
+Defining the variables
+\begin{equation}
+\beta=t_0\eta,\quad
+\epsilon_i = \frac{t_0}{p_0}f_i,
+\end{equation}
+the dimensionless version of the equations of motion become
+\begin{align}
+\phi_i'&=\frac{\rho_i}{\mu_i},\\
+\rho_i'&=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\beta\rho_i+\epsilon_i
+	-\sin\phi_i.
+\end{align}
+If we now go back and express the original Hamiltonian in terms of the dimensionless variables, we have
+\begin{equation}
+H=\frac{V_0}{2}\sum_{i=1}^N
+	\left[\frac{{\rho_i}^2}{2\mu_i}
+	+\frac{\gamma_i}{2}\left(\phi_i-\phi_{i-1}-\alpha_i\right)^2
+	+\left(1-\cos\phi_i\right)\right].
+\end{equation}
+In summary, the three important parameters are the dimensionless spring constant,
+\begin{equation}
+\gamma_i=\frac{g_i}{g_0}=\frac{\lambda^2}{2\pi^2V_0}\,g_i,
+\end{equation}
+the dimensionless damping,
+\begin{equation}
+\beta=t_0\eta=\frac{\lambda}{2\pi}\sqrt{\frac{2m}{V_0}}\,\eta,
+\end{equation}
+and the dimensionless external forcing,
+\begin{equation}
+\epsilon_i=\frac{t_0}{p_0}\,f_i=\frac{\lambda}{\pi V_0}\,f_i.
+\end{equation}
+
+\end{document}
