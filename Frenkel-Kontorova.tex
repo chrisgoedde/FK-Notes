@@ -340,6 +340,62 @@ f=\frac{p_0\epsilon}{t_0}.
 \]
 This should be the maximum driving we use when setting up our initial condition. In practice, the above estimate is too low, and I used a maximum force of three times this for setting the width of the soliton.
 
+\subsection{Variable Channel}
+
+In a uniform channel, the substrate potential has the form
+\[
+V_\text{s}(z_i)=\frac{V_0}{2}\left(1-\cos\frac{2\pi z_i}{\lambda}\right).
+\]
+We want to make a channel with a variable wavelength and a variable amplitude. A simple way to do this is to have two regions, one with wavelength and amplitude $\lambda_1$ and $V_1$ and the other with wavelength and amplitude $\lambda_2$ and $V_2$. Let there be $M$ wavelengths to the right of $z=0$ in the first region. In this case, the substrate potential will have the form
+\[
+V_\text{s}(z_i)=\begin{cases}
+	\displaystyle
+	\frac{V_1}{2}\left(1-\cos\frac{2\pi z_i}{\lambda_1}\right),
+		\quad&\quad
+		z_i < M\lambda_1,\\\\
+	\displaystyle
+	\frac{V_2}{2}\left(1
+		-\cos\frac{2\pi (z_i-M\lambda_1)}{\lambda_2}\right),
+		\quad&\quad
+		z_i > M\lambda_1.\end{cases}
+\]
+The corresponding forces are
+\[
+F_\text{s}(z_i)=\begin{cases}
+	\displaystyle
+	-\frac{\pi V_1}{\lambda_1}\sin\frac{2\pi z_i}{\lambda_1},
+		\quad&\quad
+		z_i < M\lambda_1,\\\\
+	\displaystyle
+	-\frac{\pi V_2}{\lambda_2}
+		\sin\frac{2\pi (z_i-M\lambda_1)}{\lambda_2},
+		\quad&\quad
+		z_i > M\lambda_1.\end{cases}
+\]
+If we use the same dimensionless variables as above, taking $\lambda=\lambda_1$, $V_0=V_1$, and defining $\Lambda=\lambda_2/\lambda_1$ and $\Psi=V_2/V_1$ as the ratio of the wavelength and amplitude in the two sections, the dimensionless potential and force are
+\[
+V_\text{s}(z_i)=\begin{cases}
+	\displaystyle 1-\cos\phi_i,
+		\quad&\quad
+		\phi_i < 2\pi M,\\\\
+	\displaystyle \Psi\left(1 -\cos\frac{\phi_i-2\pi M}{\Lambda}\right),
+		\quad&\quad
+		\phi_i > 2\pi M.\end{cases}
+\]
+and
+\[
+F_\text{s}(z_i)=\begin{cases}
+	\displaystyle
+	-\sin\phi_i,
+		\quad&\quad
+		\phi_i < 2\pi M,\\\\
+	\displaystyle
+	-\frac{\Psi}{\Lambda}\sin\frac{\phi_i-2\pi M}{\Lambda},
+		\quad&\quad
+		\phi_i > 2\pi M.\end{cases}
+\]
+
+
 \subsection{Two Dimensional Model}
 
 To try to get a sense of what's going on in the molecular dynamics simulations, let's make up a two dimensional model. This may give us some insight into the energy transfer between the directions and the effect of the damping in the axial and transverse directions. For our two dimensional model, we'll take the Hamiltonian to be
