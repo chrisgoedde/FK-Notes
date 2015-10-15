@@ -1,0 +1,100 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc, lucidbry}
+\usepackage{mynotes,cite}
+
+\pagestyle{notes}
+\renewcommand{\NotesTitle}{Thermal Probabilities, }
+
+\begin{document}
+
+The goal of these notes is to try to understand the agreement between the probabilities as calculated from theory and simulation, as shown in Figure~\ref{fig:prob}. I'll try to summarize as best I can the calculations that produced this figure as well as my understanding of why the two calculations agree.
+
+\MyCaptionedFig{Figs/SolitonProbabilities}{Probability of observing $n$ solitons.}{fig:prob}{5in}
+
+First, the configuration of the chain at each time step of each run (or runs) at a given temperature is considered to be a single microstate of the system. That gives a total of $N_\text{total}$ microstates to be considered at each temperature $\tau$. The number of solitons (anti-kinks in this example, because $a/\lambda=1.05$) is found for each microstate. Let $N_n$ be the number of states with $n$ solitons. This is the multiplicity of the macrostate with $n$ solitons. Then of course the total number of states is
+\begin{equation}
+N_\text{total}=\sum_{n=0}^{n_\text{max}} N_n.
+\end{equation}
+In Figure~\ref{fig:prob}, $n_\text{max}=4$
+
+The ``simulation'' probability in Figure~\ref{fig:prob} is then calculated to be
+\begin{equation}
+P_n = \frac{N_n}{N_\text{total}}.
+\end{equation}
+To calculate the ``theory'' probability, we use the Boltzmann factor. Let $E_{i_n}^n$ be the energy of the ${i_n}^{\text{th}}$ state with $n$ solitons. So $E_1^0$, $E_2^0$ $E_3^0$ $\ldots$ $E_{N_0}^0$ are the energies of the microstates in the 0-soliton macrostate, $E_1^1$, $E_2^1$ $E_3^1$ $\ldots$ $E_{N_1}^1$ are the energies of the microstates in the 1-soliton macrostate, \textit{etc}.
+
+We now need to calculate the partition function. Let
+\begin{equation}
+Z_n=\sum_{i_n=1}^{N_n}\e^{-E_{i_n}^n/\tau},
+\end{equation}
+where $\tau$ is the temperature of the system, be the partition function for the macrostate with $n$ solitons. This is of course just the sum of the Boltzmann factors for the $n$-soliton macrostate. The partition function for the system is then
+\begin{equation}
+Z=\sum_{n=0}^{n_\text{max}} Z_n.
+\end{equation}
+In this notation, the ``theory'' probability is simply
+\begin{equation}
+\Ps_n=\frac{Z_n}{Z}.
+\end{equation}
+To compare $P_n$ and $\Ps_n$, we need to estimate the Boltzmann factors. To do this I'll use the data from Figure~\ref{fig:dist} and Figure~\ref{fig:avg}. (I know that the data in Figure~\ref{fig:dist} isn't completely accurate, but it doesn't affect my argument, since the inaccuracies only affect the average energies.)
+
+\MyCaptionedFig{Figs/SolitonStateEnergiesDist}{Distribution of the energies of the microstates within different macrostates.}{fig:dist}{5in}
+
+\MyCaptionedFig{Figs/SolitonStateAvgEnergies}{Average energies of the different macrostates.}{fig:avg}{5in}
+
+Let $\Es^n$ be the average energy of the macrostate with $n$ solitons. In other words,
+\begin{equation}
+\Es^n=\frac{1}{N_n}\sum_{i_n=1}^{N_n} E_{i_n}^n.
+\end{equation}
+Now measure the energy of each microstate relative to this average:
+\begin{equation}
+E_{i_n}^n=\Es^n+\epsilon_{i_n}.
+\end{equation}
+The partition function for the $n$-soliton macrostate can then be written as
+\begin{equation}
+Z_n=\sum_{i_n=1}^{N_n}\e^{-E_{i_n}^n/\tau}
+	=\e^{-\Es^n/\tau}\sum_{i_n=1}^{N_n}\e^{-\epsilon_{i_n}/\tau}.
+\end{equation}
+We need to estimate this last sum. Looking at Figure~\ref{fig:dist}, I estimate that $|\epsilon_{i_n}|\sim 50\,\text{K}$ or less, at least for the large majority of the microstates. Since the temperature is large compared to this, $\tau>130\,\text{K}$, we can expand the exponentials in the sum:
+\begin{equation}
+Z_n\simeq\e^{-\Es^n/\tau}\sum_{i_n=1}^{N_n}
+	\left[1-\frac{\epsilon_{i_n}}{\tau}\right].
+\end{equation}
+Furthermore, since the distributions shown in Figure~\ref{fig:dist} are symmetric about the mean, for each positive $\epsilon_{i_n}$ there will be a corresponding negative $\epsilon_{i_n}$, and the terms in this sum with $\epsilon_{i_n}$ will cancel pair-wise, so I conclude that
+\begin{equation}
+Z_n\simeq\e^{-\Es^n/\tau}\sum_{i_n=1}^{N_n} 1=N_n\e^{-\Es^n/\tau}.
+\end{equation}
+Thus, we can replace the sum of the Boltzmann factors with the ``average'' Boltzmann factor multiplied by the multiplicity of the microstate. That leads to a partition function for the entire system of
+\begin{equation}
+Z=\sum_{n=0}^{n_\text{max}} N_n\e^{-\Es^n/\tau}.
+\end{equation}
+Lastly, from Figure~\ref{fig:avg}, I conclude that the average energies of the macrostates increase linearly with $n$, with a slope of approximately $7\,\text{K}$:
+\begin{equation}
+\Es_n=\Es_0+(7\,\text{K})n.
+\end{equation}
+Thus, we can write
+\begin{equation}
+Z_n=N_n\e^{-\Es^n/\tau}=N_n\e^{-\Es^0/\tau}\e^{-(7\,\text{K})n/\tau}
+\end{equation}
+and
+\begin{equation}
+Z=\e^{-\Es^0/\tau}\sum_{n=0}^{n_\text{max}}N_n\e^{-(7\,\text{K})n/\tau}.
+\end{equation}
+Note that when we go to calculate the probabilities that the factor of $\e^{-\Es^0/\tau}$ will cancel, so we can drop it.
+
+Finally, because we are at relatively high temperatures, we can expand the remaining exponentials:
+\begin{equation}
+\e^{-(7\,\text{K})n/\tau}\simeq 1-\frac{(7\,\text{K})n}{\tau}.
+\end{equation}
+That leaves us with
+\begin{equation}
+\Ps_n=\frac{\displaystyle N_n\left(1-\frac{(7\,\text{K})n}{\tau}\right)}
+	{\displaystyle\sum_{n=0}^{n_\text{max}} N_n\left(1-\frac{(7\,\text{K})n}{\tau}\right)}.
+\end{equation}
+Again, in the limit that $\tau\gg 7\,\text{K}$, and for $n_\text{max}=4$, we can mostly ignore the terms proportional to $n$, at least in the denominator. So this formula seems to reduce to something very similar to the formula for $P_n$.
+
+The correction factor in the numerator would also seem to explain the systematic difference between the ``simulation'' and ``theory'' results for larger values of $n$ seen in Figure~\ref{fig:prob}.
+
+Lastly, this analysis won't hold if $\tau$ approaches the width of the distributions shown in Figure~\ref{fig:dist}. But since those widths are determined by the temperature (they should get smaller as $\tau$ gets smaller), maybe that will never happen. In that case, I would expect the ``theory'' and ``simulation'' results to agree down to very low temperatures, when $\tau\sim7\,\text{K}$ or thereabouts.
+
+\end{document}
