@@ -57,6 +57,8 @@ In terms of these variables, the equations of motion become
 \end{align*}
 Note that if all the masses and springs are identical, then $\mu_i=1$ and all the $\alpha_i$ are equal so that they cancel, and this reduces to a one-parameter set of equations.
 
+For the ring geometry, the total length of the nanotube is $N_0\lambda$. In terms of $\phi$, this is $2\pi N_0$. To enforce periodicity, the dimensionless rest length of the last spring should be increased by this amount.
+
 The initial location of water molecule $i$ is taken to be $z_i=(i-1)L/N$, so that $z_i$ falls in the range $[0,(N-1)L/N]$. This means that the dimensionless position $\phi_i$ falls in the range $[0,2\pi(N-1)L/(N\lambda)]$. Using $L=2N_0\lambda$ and $N=N_0+S$, this range becomes $[0,4\pi(N-1)N_0/N]$. If $S=0$, then $N=N_0$, and this becomes $[0,4\pi(N_0-1)]$. The ring geometry means that $\phi=4\pi$ is the same location as $\phi=0$, so the dimensionless length of the last spring should be increased by $4\pi$.
 
 In the code, we'll take the above initial condition, then let the chain relax to a minimum-energy soliton, before we apply any external driving force.
@@ -114,7 +116,7 @@ Lastly, we want to add thermal noise to the equations. Following Braun and Kivsh
 \[
 \langle\delta F_i(t)\delta F_j(t')\rangle=2\eta m_ik_\text{B}T\delta(t-t')\delta_{ij}.
 \]
-Here $k_\text{B}$ is the Boltzmann constant and $T$ is the temperature.
+Here $k_\text{B}$ is the Boltzmann constant and $T$ is the temperature. We'll use the dimensionless variable $\Theta = k_\text{B}T/(V_0/2)$ for the temperature.
 
 Braun and Kivshar pick a different spatial correlation, though they also say that the spatial correlation ``may be defined in an arbitrary manner.'' I don't quite understand this, but no spatial correlation seems reasonable to me.
 
@@ -138,16 +140,16 @@ and the normalization factor $A_i$ is simply
 \[
 A_i=\sqrt{\frac{2\eta m_ik_\text{B}T}{\Delta t}}.
 \]
-This has units of force, of course, or momentum per unit time. In the code, a random variable with magnitude $A_i\Delta t$ will be added to the momentum at intervals of $\Delta t$. In terms of the non-dimensional variables $\rho_i$ and $\tau$, this magnitude becomes
+This has units of force, of course, or momentum per unit time. In the code, a random variable with magnitude $P_i=A_i\Delta t$ will be added to the momentum at intervals of $\Delta t$. In terms of the non-dimensional momentum $\rho_i$, this impulse becomes
 \[
-\Omega_i=\frac{t_0}{p_0}A_i,
+\Omega_i=\frac{P_i}{p_0},
 \]
 so that
 \[
-\Omega_i=\frac{t_0}{p_0}A_i
-	=\frac{t_0}{p_0}\sqrt{\frac{2\eta m_ik_\text{B}T}{\Delta t}}.
+\Omega_i=\frac{1}{p_0}\sqrt{2\eta m_ik_\text{B}T \Delta t}
+	=\sqrt{4\mu_i\beta\Theta\,\Delta\tau}.
 \]
-In the code we'll multiply $\Omega_i$ by $\Delta\tau$ and add it into the momentum every $\Delta\tau$.
+In the code we'll add $\Omega_i$ into the momentum every $\Delta\tau$ time step.
 
 Some authors use a different convention and put the discreteness parameter in the sine term, making the spring constants equal to unity. To relate this to our parameters above, define the average spring constant as
 \[
@@ -178,6 +180,8 @@ CNT type & $h$ (kcal/mol) & $c$ (nm/ps) \\\hline
 \end{center}
 
 Here $h$ is the peak-to-peak amplitude of the substrate potential and $c$ is the speed of sound in water inside the nanotube. I think the conversion factor from $\text{kcal}/\text{mol}$ to J is $6.948\times10^{-21}$. We therefore have, for the (4, 4) nanotube, $V_0=2.432\times10^{-21}\,\text{J}$. For the (5, 5) nanotube this is $V_0=1.112\times10^{-22}\,\text{J}$, and for the (6, 6) nanotube it is $V_0=1.459\times10^{-23}\,\text{J}$.
+
+The Boltzmann constant is $1.38\times10^{-23}\,\text{J}/\text{K}$, so $T=20,\text{K}$ corresponds to $2.76\times10^{-22}\,\text{J}$, or $\Theta = 0.113$ for the (4, 4) nanotube. A temperature of $T=300\,\text{K}$ is then $\Theta=1.70$.
 
 To find the spring constant, we'll use the wave speed given above, which can be written as
 \[
@@ -214,7 +218,7 @@ v=\pm a\sqrt{\frac{g}{m}}
 	=\pm a\sqrt{\frac{g}{m}}
 	\left[1+\left(\frac{4p_0\eta}{\pi f}\right)^2\right]^{-1/2}.
 \]
-From Figure 4 of the Sisan/Lichter PRL, we see that at low temperatures ($T=5\,\text{K}$), the flow rate for the (4, 4) nanotube has an elbow (that is, saturates) at an external force of about $10^{-2}\,\text{pN}$. Using the parameters above to calculate $p_0=6.032\times10^{-12}\,\text{pN}\udot\text{s}$,  the above formula reproduces the location of the elbow with a damping of about $3\times10^{9}\,\text{Hz}$. Since we picked $g$ to match the wave speed as given in the above table, this also gives a maximum soliton speed of $11.1\,\text{nm}/\text{ps}$.
+From Figure 4 of the Sisan/Lichter PRL, we see that at low temperatures ($T=5\,\text{K}$), the flow rate for the (4, 4) nanotube has an elbow (that is, saturates) at an external force of about $10^{-2}\,\text{pN}$. Using the parameters above to calculate $p_0=6.032\times10^{-12}\,\text{pN}\udot\text{s}$,  the above formula reproduces the location of the elbow with a damping of about $3\times10^{9}\,\text{Hz}$. (This corresponds to $\beta=2.91\times10^{-4}$ for the (4, 4) nanotube, so it is very weak damping.) Since we picked $g$ to match the wave speed as given in the above table, this also gives a maximum soliton speed of $11.1\,\text{nm}/\text{ps}$.
 
 For the (5, 5) nanotube, the flow rate saturates around $4\times10^{-3}\,\text{pN}$. Using the value for $p_0$ for this nanotube leads to a damping of about $3\times10^9\,\text{Hz}$, same as for the (4, 4) nanotube.
 
@@ -395,6 +399,75 @@ F_\text{s}(z_i)=\begin{cases}
 		\phi_i > 2\pi M.\end{cases}
 \]
 
+\subsection{Comparison to Frank and van der Merwe}
+
+Frank and van der Merwe (\textit{Proceedings of the Royal Society of London. Series A, Mathematical and Physical Sciences}, \textbf{198}, pp. 205-216, 1949) present some simple calculations of some equilibrium solutions of the chain. To understand their calculation better, we'll translate our notation into theirs. We begin with the dimensionless force equation,
+\[
+\rho_i'=-\gamma_i(\phi_i-\phi_{i-1}-\alpha_i)
+	+\gamma_{i+1}(\phi_{i+1}-\phi_i-\alpha_{i+1})
+	-\sin\phi_i.
+\]
+Taking all the springs to be identical and setting the rate of change of the momentum equal to zero, we obtain
+\[
+\gamma(\phi_{i+1}+\phi_{i-1}-2\phi_i)=\sin\phi_i.
+\]
+Frank and van der Merwe use the relative location $\zeta_i$, which is related to our $\phi_i$ through
+\[
+\frac{\phi_i}{2\pi}=\zeta_i+(i-1).
+\]
+In other words, $\zeta_i$ is measured relative to the $i^\text{th}$ potential minimum, taking the first minimum to be located at 0.
+
+Using $\zeta_i$ in the equilibrium equation, we obtain
+\[
+2\pi\gamma(\zeta_{i+1}+\zeta_{i-1}-2\zeta_i)=\sin2\pi\zeta_i.
+\]
+Note that this only applies to particles in the middle of the chain; it does not apply to the particles on the ends.
+
+This is their Equation (2). From this comparison we see that
+\[
+2\pi\gamma=\frac{2{l_0}^2}{\pi}\quad\Rightarrow\quad {l_0}^2=\pi^2\gamma.
+\]
+So their ${l_0}^2$ is proportional to our dimensionless spring constant.
+
+The equations for the particles on either end are
+\[
+-\gamma(\phi_N-\phi_{N-1}-\alpha)=\sin\phi_N\quad\text{and}\quad
+\gamma(\phi_2-\phi_1-\alpha)=\sin\phi_1.
+\]
+In terms of $\zeta_i$ these become
+\[
+-2\pi\gamma\left(\zeta_N-\zeta_{N-1}+1-\frac{\alpha}{2\pi}\right)
+	=\sin2\pi\zeta_N
+\quad\text{and}\quad
+2\pi\gamma\left(\zeta_2-\zeta_1+1-\frac{\alpha}{2\pi}\right)
+	=\sin2\pi\zeta_1.
+\]
+These equations apply to a chain with both ends free. If we want to find an equilibrium solution for such a chain, then we need to solve these equations simultaneously:
+\begin{align*}
+\zeta_{N-1}&=\zeta_N+\frac{1}{2\pi\gamma}\sin2\pi\zeta_N+1
+	-\frac{\alpha}{2\pi},\\
+\zeta_{i-1}&=2\zeta_i-\zeta_{i+1}+\frac{1}{2\pi\gamma}\sin2\pi\zeta_i,\\
+\zeta_1+\frac{1}{2\pi\gamma}\sin2\pi\zeta_1&=\zeta_2+1
+	-\frac{\alpha}{2\pi}.
+\end{align*}
+This last equation is transcendental, but I don't think that should be a problem.
+
+Frank and van der Merwe use another parameter, $P_0$, which is related to our parameters through
+\[
+\frac{1}{P_0}=\frac{\alpha}{2\pi}-1,
+\]
+by comparison of their equations to the above.
+
+Here's another take. In terms of $\zeta_i$, the force on the $i^\text{th}$ particle is
+\begin{align*}
+\rho_i'
+	&=-2\pi\gamma\left(\zeta_i-\zeta_{i-1}+1-\frac{\alpha}{2\pi}\right)
+		+2\pi\gamma\left(\zeta_{i+1}-\zeta_i+1-\frac{\alpha}{2\pi}\right)
+		-\sin2\pi\zeta_i\\
+	&=F_\text{left}(\zeta_i)+F_\text{right}(\zeta_i)
+		+F_\text{sub}(\zeta_i).
+\end{align*}
+In equilibrium, $F_\text{left}(\zeta_i)+F_\text{right}(\zeta_i)+F_\text{sub}(\zeta_i)=0$. Also, when $i=1$, $F_\text{left}(\zeta_1)=$ and when $i=N$, $F_\text{right}(\zeta_N)=0$, because these particles are only attached to one spring each.
 
 \subsection{Two Dimensional Model}
 
